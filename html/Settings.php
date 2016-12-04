@@ -1,8 +1,8 @@
 <?php
-	include("connect.php");
-	include("search_book.php");
+  include("connect.php");
+  include("search_book.php");
   session_start();
-	?>
+  ?>
 <?php
     
       
@@ -78,6 +78,44 @@
       }
     }
 
+
+    if(isset($_POST['save_pass'])){
+      $oldpass=$_POST['oldpass'];
+      $newpass=$_POST['newpass'];
+      $repass =$_POST['repass'];
+
+      if($repass==''||$newpass==''||$oldpass==''){
+          msg("Current password, new password, and password retype confirmation must be filled out to make changes to your current password.");
+      } else {
+        $sql = "SELECT * FROM account WHERE account_id='$account_id' AND password=MD5('$oldpass')";
+        $check = mysqli_query($dbconn,$sql);
+        if(mysqli_num_rows($check)==0){
+            msg("Sorry, that’s not your current password!");
+        }
+        if($repass!=$newpass){
+            msg("Oops, new password and confirmation don’t match!");
+        }
+        if((strlen($newpass)<6)||(countDigits($newpass)<1)||(strlen($repass)<6)||(countDigits($repass)<1)){
+            msg("New password must at least be 6 characters long and should contain at least 1 integer.");
+        }
+        if(mysqli_num_rows($check)>0&&$repass==$newpass&&(strlen($newpass)>6)&&(countDigits($newpass)>1)){
+          $change = "UPDATE account SET password=MD5('$newpass') WHERE account_id='$account_id'";
+          $change1 = mysqli_query($dbconn,$change);
+          if($change1){
+             header("Refresh:0");
+             msg("Password changed");
+          } else {
+              msg("Error while changing password.");
+          }
+        }
+
+      }
+    }
+
+    function countDigits( $str ) {
+      return preg_match_all( "/[0-9]/", $str );
+    }
+
     function msg($mess){?>    
     <p><?=$mess;?></p>
     <?php }
@@ -89,14 +127,14 @@
 <!DOCTYPE html>
 <html class="no-js">
 <head>
-	<meta charset="utf-8">
-	<meta name="author" content="CMSC 128 Lab Sec. 2">
-	<meta name="description" content="Sell, buy, and trade books with your schoolmates.">
-	<meta name="keywords" content="Book, Books, Trade Book, Sell Book, Buy Book">
-	<title> Account Settings </title>
+  <meta charset="utf-8">
+  <meta name="author" content="CMSC 128 Lab Sec. 2">
+  <meta name="description" content="Sell, buy, and trade books with your schoolmates.">
+  <meta name="keywords" content="Book, Books, Trade Book, Sell Book, Buy Book">
+  <title> Account Settings </title>
 
   <link rel="shortcut icon" href="../images/official_logo.png">
-	<link rel="stylesheet" type="text/css" href="../css/style.css">
+  <link rel="stylesheet" type="text/css" href="../css/style.css">
   <link rel="stylesheet" type="text/css" href="../css/stylesettings.css">
   <script src="../js/jquery.min.js"></script>
   <link rel="stylesheet" type="text/css" href="../css/normalize.css">
@@ -106,28 +144,28 @@
 
 </head>
 <body>
-	<div class="wrapper">
-	<header>
-		<nav>
-			<ul>
+  <div class="wrapper">
+  <header>
+    <nav>
+      <ul>
             <li class="nav_lib">
-            	<div>
-           			<a href="Library.php">
-           				<img src="../images/official_logo.png" title="Library" alt="Library" height="50" width="50" id="logo">
-           				<label for="library" id="logolabel">Library</label>
-           			</a>
-           		</div>
+              <div>
+                <a href="Library.php">
+                  <img src="../images/official_logo.png" title="Library" alt="Library" height="50" width="50" id="logo">
+                  <label for="library" id="logolabel">Library</label>
+                </a>
+              </div>
             </li>
             <li class="nav_srch">
-            	<span class="col-xs-4">            	
-            		<form method="post" action = "<?php $_PHP_SELF; ?>">
-						<input type="search" name="search" placeholder="Search..." class="form-control-srch" id="noborder">
-						<input type="submit" name="submit" value="GO" class="btn btn-success">
-					</form>
-				</span>
+              <span class="col-xs-4">             
+                <form method="post" action = "<?php $_PHP_SELF; ?>">
+            <input type="search" name="search" placeholder="Search..." class="form-control-srch" id="noborder">
+            <input type="submit" name="submit" value="GO" class="btn btn-success">
+          </form>
+        </span>
             </li>
             <li class="nav_prof">
-            	<div>
+              <div>
                 <a href="Profile.php">
                   <img src="<?php echo $user_image;?>" title="Profile" alt="Profile" height="40" width="40" id="logo2">
                   <label for="username"><?php echo $_SESSION['username'];?></label>
@@ -135,25 +173,25 @@
               </div>
             </li>
             <li class="nav_set">
-            	<div>
-            		<label for="settings">
-            			<a href="Settings.php">Settings</a> |
-            		</label>
-            	</div>
+              <div>
+                <label for="settings">
+                  <a href="Settings.php">Settings</a> |
+                </label>
+              </div>
             </li>
-           	<li class="nav_log">
-           		<div>
-           		<a href="index.php">
-           			<label for="logout" id="logout">Log-out</label>
-           		</a>
-           		</div>
-           	</li>
-        	</ul>
-		</nav>
-	</header>
-	<div class="container">
-			<a href="Settings.php"><h1 id="bookshelf">Account Settings</h1></a>
-	  <div class="set_section well well-sm">
+            <li class="nav_log">
+              <div>
+              <a href="index.php">
+                <label for="logout" id="logout">Log-out</label>
+              </a>
+              </div>
+            </li>
+          </ul>
+    </nav>
+  </header>
+  <div class="container">
+      <a href="Settings.php"><h1 id="bookshelf">Account Settings</h1></a>
+    <div class="set_section well well-sm">
 
       <div class="dropdown_menu">
         <div class="edit_container">
@@ -161,6 +199,7 @@
         </div>
         <div id="edit_dropdown" class="edit_dropdown_content">
             <a  data-toggle="modal" data-target="#myModal5">Change Photo</a>
+            <a  data-toggle="modal" data-target="#myModal5A">Change Password</a>
             <a href="edit.php">Edit Account</a>
         </div>
      </div>
@@ -251,12 +290,41 @@
     </div>
   </div>
 
+<!-- CHANGE PASSWORD MODAL -->
+<div class="modal fade" id="myModal5A" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+      <form method="post" action="<?php $_PHP_SELF; ?>">
+        <div class="modal-header">
+          <h4 class="modal-title">Change Your Password</h4>
+        </div>
+        <div class="modal-body">
+          <content class="col-xs-set password">
+              <label id="oldpass">Old Password:</label>
+              <input class="form-control-set" type="password" name="oldpass"> 
+              <label id="newpass">New Password:</label>
+              <input class="form-control-set" type="password" name="newpass"> 
+              <label id="repass">Re-type Password:</label>
+              <input class="form-control-set" type="password" name="repass"> 
+          </content>
+        </div>
+        <div class="modal-footer">
+        <input type="submit" value="UPDATE" name="save_pass" class="btn btn-default">
+        <input type="submit" value="CANCEL" class="btn btn-danger">
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
 <!-- DON'T -->
     </div>
-		<footer>
-			<p>A.Y. 2016-2017 Bookshare | &copy;CMSC 128 Lab Sec. 2 |  2016</p>
-		</footer>
-	</div>
+    <footer>
+      <p>A.Y. 2016-2017 Bookshare | &copy;CMSC 128 Lab Sec. 2 |  2016</p>
+    </footer>
+  </div>
 
 
 </body>
