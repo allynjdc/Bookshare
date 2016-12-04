@@ -41,13 +41,19 @@
 
 
 	if(isset($_POST['add_to_cart'])){
-		$sql = "INSERT INTO cart (seller_id, book_id, buyer_id, date) VALUES ('$seller', '$id', '$buyer_id','$date')";
-		$sqlresult = mysqli_query($dbconn,$sql);
-		if($sqlresult){
-			header("Location:Shopping_list.php");
+		$sqlee = "SELECT * FROM cart WHERE seller_id='$seller' AND book_id='$id' AND buyer_id='$buyer_id'";
+		$sqle = mysqli_query($dbconn,$sqlee);
+		if(mysqli_num_rows($sqle)>0){
+			msg("you already add this book in your cart.");
 		} else {
-			msg("unable to add book.");
-		}
+			$sql = "INSERT INTO cart (seller_id, book_id, buyer_id, date) VALUES ('$seller', '$id', '$buyer_id','$date')";
+			$sqlresult = mysqli_query($dbconn,$sql);
+			if($sqlresult){
+				header("Location:Shopping_list.php");
+			} else {
+				msg("unable to add book.");
+			}
+		} 
 	}
 
 
