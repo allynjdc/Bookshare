@@ -98,7 +98,9 @@
           		</p>
           		      		
 	      		<form id="proceed"><!-- Authentication will be a nightmare. Probably need PHP sessions or something -->
-					<p><a id="action" style="color:red;" class="btn-link" href="Delete_Bookmark.php?id=<?php echo $row['book_id']?>">Remove</a></p>
+	      			<p>	<a id="action" style="color:green;" class="btn-link" href="Add_to_Cart.php?id=<?php echo $row['book_id']?>">Add to Cart</a>
+	      				<a id="action" style="color:red;" class="btn-link" href="Delete_Bookmark.php?id=<?php echo $row['book_id']?>">Remove</a>
+	      			</p>
 					<!-- cancel link here-->
 				</form>
 				
