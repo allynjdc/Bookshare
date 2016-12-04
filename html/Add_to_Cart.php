@@ -32,7 +32,7 @@
 		$sql = "INSERT INTO cart (seller_id, book_id, buyer_id, date) VALUES ('$seller', '$id', '$buyer_id','$date')";
 		$sqlresult = mysqli_query($dbconn,$sql);
 		if($sqlresult){
-			$query = "DELETE FROM bookmarks WHERE book_id='$book_id' AND buyer_id='$buyer_id'";
+			$query = "DELETE FROM bookmarks WHERE book_id='$id' AND buyer_id='$buyer_id'";
 			if(mysqli_query($dbconn,$query)){
 				header("Location:Shopping_list.php");
 			}
