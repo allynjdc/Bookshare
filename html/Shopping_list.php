@@ -4,9 +4,8 @@
 	include("search_book.php");
 	session_start();
 
-	date_default_timezone_set('Asia/Manila');
-	$date=date("Y-m-d");
-
+	
+	$date=date_default_timezone_set('Asia/Manila');
 	$buyer_id = $_SESSION['buyer_id'];
 	$user_query= "SELECT * from account where account_id='$buyer_id'";
     $user_result=mysqli_query($dbconn, $user_query);
@@ -86,11 +85,12 @@
 
 			$buyer_id = $_SESSION['buyer_id'];
 
-			$select_query = "SELECT * from books join account on books.account_id=account.account_id join cart on cart.book_id=books.book_id WHERE cart.buyer_id='$buyer_id' AND date='$date'";
+			$select_query = "SELECT * from books join account on books.account_id=account.account_id join cart on cart.book_id=books.book_id WHERE cart.buyer_id='$buyer_id'";
 			$result = mysqli_query($dbconn, $select_query);
-
+			$total=0;
 			if(mysqli_num_rows($result)>0){
-				while($row=mysqli_fetch_assoc($result)){?>
+				while($row=mysqli_fetch_assoc($result)){
+					$total += $row['book_price']; ?>
 
 
 			<div class="list_content">
@@ -99,26 +99,22 @@
           			<strong><?php echo $row['book_price']?></strong>
           			<label id="bookname"><?php echo $row['book_name']?></label>
 					<label id="accname"><?php echo $row['account_name']?></label>
+
+					<form id="proceed"><!-- Authentication will be a nightmare. Probably need PHP sessions or something -->
+		      			<p>	
+		      				<a id="action" style="color:red;" class="btn-link" href="Delete_cart.php?id=<?php echo $row['book_id']?>">Remove</a>
+		      			</p>
+						<!-- cancel link here-->
+					</form>
+
           		</p>
       		</div>
-      		
-				
-			
+
 				<?php
 				}
-			}
-
-			$subtotal = "SELECT sum(book_price) as Price from books join cart on cart.book_id=books.book_id WHERE cart.buyer_id='$buyer_id'";
-			$retresult = mysqli_query($dbconn,$subtotal);
-			if(mysqli_num_rows($retresult)>0){
-				while($row=mysqli_fetch_assoc($retresult)){
-					$price_result = $row['Price'];
-				}
-				?>
-
-
-				<div class="foot">Subtotal: <content><?php echo $price_result?></content></div>
-	<?php 	} ?>
+			} ?>
+			<div class="foot">Subtotal: <content><?php echo $total?></content></div>
+			
 			<form id="proceed"> <!-- Authentication will be a nightmare. Probably need PHP sessions or something -->
 				<p><a href="" data-toggle="modal" data-target="#myModalP">Checkout</a></p>
 				<!-- cancel link here-->
